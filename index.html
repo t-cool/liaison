@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Liaison and Stress</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Liaison and Stress</h1>
+        <div class="controls">
+            <input type="text" id="sentenceInput" placeholder="Enter an English sentence..." value="I went to the station with his sister.">
+            <button id="analyzeBtn">Analyze</button>
+            <button id="playBtn">Play with Audio</button>
+            <button id="stopBtn" style="display:none;">Stop</button>
+        </div>
+        <div class="speed-control">
+            <label for="speedSlider">Speech Speed:</label>
+            <input type="range" id="speedSlider" min="0.5" max="2.0" step="0.1" value="0.9">
+            <span id="speedValue">0.9x</span>
+        </div>
+        <canvas id="visualizationCanvas" width="1200" height="400"></canvas>
+        <div class="legend">
+            <div class="legend-item">
+                <span class="stress-marker"></span> Stressed syllable
+            </div>
+            <div class="legend-item">
+                <span class="liaison-marker"></span> Liaison connection
+            </div>
+            <div class="legend-item">
+                <span class="delete-marker">/</span> Deleted sound
+            </div>
+        </div>
+    </div>
+    <script src="main.js"></script>
+</body>
+</html>
