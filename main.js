@@ -200,9 +200,12 @@ class LiaisonVisualizer {
         return syllableCount + complexity;
     }
 
-    playWithAnimation(sentence) {
+    playWithAnimation(sentence, onComplete = null) {
         // Stop any ongoing animation
         this.stopAnimation();
+
+        // Store completion callback
+        this.onComplete = onComplete;
 
         const words = sentence.split(' ');
         let currentWordIndex = -1;
@@ -349,6 +352,11 @@ class LiaisonVisualizer {
                     cancelAnimationFrame(this.animationId);
                     this.animationId = null;
                 }
+
+                // Call completion callback if provided
+                if (this.onComplete) {
+                    this.onComplete();
+                }
             };
 
             // Speak the entire sentence naturally
@@ -374,6 +382,11 @@ class LiaisonVisualizer {
                 } else {
                     this.currentHighlight = -1;
                     this.visualizeSentence(sentence);
+
+                    // Call completion callback if provided
+                    if (this.onComplete) {
+                        this.onComplete();
+                    }
                 }
             };
 
@@ -469,14 +482,20 @@ document.addEventListener('DOMContentLoaded', function() {
     playBtn.addEventListener('click', function() {
         const sentence = getCurrentSentence();
 
+        // Callback to reset buttons when playback completes
+        const onPlaybackComplete = () => {
+            playBtn.style.display = 'inline-block';
+            stopBtn.style.display = 'none';
+        };
+
         // Ensure voices are loaded before playing
         if ('speechSynthesis' in window && speechSynthesis.getVoices().length === 0) {
             // Wait a bit for voices to load
             setTimeout(() => {
-                visualizer.playWithAnimation(sentence);
+                visualizer.playWithAnimation(sentence, onPlaybackComplete);
             }, 100);
         } else {
-            visualizer.playWithAnimation(sentence);
+            visualizer.playWithAnimation(sentence, onPlaybackComplete);
         }
 
         // Toggle button visibility
