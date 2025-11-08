@@ -41,7 +41,7 @@ class LiaisonVisualizer {
     }
 
     drawText(text, x, y, isStressed = false, isHighlighted = false) {
-        this.ctx.font = isStressed ? 'bold 24px Arial' : '20px Arial';
+        this.ctx.font = isStressed ? 'bold 36px Arial' : '32px Arial';
         this.ctx.fillStyle = isHighlighted ? this.colors.highlight : this.colors.text;
         this.ctx.fillText(text, x, y);
         return this.ctx.measureText(text).width;
@@ -82,13 +82,13 @@ class LiaisonVisualizer {
             const beforeWidth = this.ctx.measureText(beforeText).width;
             const charWidth = this.ctx.measureText(deleteChar).width;
 
-            // Draw slash over the character
+            // Draw larger slash over the character
             const slashX = x + beforeWidth + charWidth / 2;
             const slashY = y - 5;
 
-            this.ctx.font = 'bold 20px Arial';
+            this.ctx.font = 'bold 48px Arial';
             this.ctx.fillStyle = this.colors.delete;
-            this.ctx.fillText('/', slashX - 5, slashY);
+            this.ctx.fillText('/', slashX - 10, slashY);
         }
     }
 
@@ -97,55 +97,71 @@ class LiaisonVisualizer {
 
         const data = sentenceData[sentence];
         if (!data) {
-            this.ctx.font = '20px Arial';
+            this.ctx.font = '32px Arial';
             this.ctx.fillStyle = this.colors.text;
             this.ctx.fillText('No data available for this sentence', this.startX, this.startY);
             return;
         }
 
         const words = sentence.replace('.', '').split(' ');
+        const maxWidth = this.canvas.width - this.startX * 2; // Leave margin on both sides
         let currentX = this.startX;
-        const y = this.startY;
+        let currentY = this.startY;
         this.wordPositions = [];
 
-        // First pass: draw words and collect positions
+        // First pass: draw words with line wrapping and collect positions
         words.forEach((word, index) => {
             const wordData = data[word];
             if (!wordData) return;
 
             const isStressed = wordData.stress === 1;
             const isHighlighted = index === highlightIndex;
-            const width = this.drawText(word, currentX, y, isStressed, isHighlighted);
+
+            // Measure word width before drawing
+            this.ctx.font = isStressed ? 'bold 36px Arial' : '32px Arial';
+            const width = this.ctx.measureText(word).width;
+
+            // Check if we need to wrap to next line
+            if (currentX + width > this.startX + maxWidth && currentX > this.startX) {
+                currentX = this.startX;
+                currentY += this.lineHeight;
+            }
+
+            // Draw the word
+            this.drawText(word, currentX, currentY, isStressed, isHighlighted);
 
             // Store position for liaison connections
             this.wordPositions.push({
                 word: word,
                 x: currentX,
-                y: y,
+                y: currentY,
                 width: width,
-                data: wordData
+                data: wordData,
+                line: Math.floor((currentY - this.startY) / this.lineHeight)
             });
 
             // Draw stress marker if needed
             if (isStressed) {
-                this.drawStressMarker(currentX, y, width);
+                this.drawStressMarker(currentX, currentY, width);
             }
 
             // Draw delete mark if needed
             if (wordData.liaison && wordData.liaison.delete) {
-                this.drawDeleteMark(word, currentX, y, wordData.liaison.delete);
+                this.drawDeleteMark(word, currentX, currentY, wordData.liaison.delete);
             }
 
             currentX += width + this.wordSpacing;
         });
 
-        // Second pass: draw liaison connections
+        // Second pass: draw liaison connections (only for words on the same line)
         for (let i = 0; i < this.wordPositions.length - 1; i++) {
             const currentWord = this.wordPositions[i];
             const nextWord = this.wordPositions[i + 1];
 
             // Check if current word has liaison that connects to next word
-            if (currentWord.data.liaison && currentWord.data.liaison.delete) {
+            // Only draw connection if both words are on the same line
+            if (currentWord.data.liaison && currentWord.data.liaison.delete &&
+                currentWord.line === nextWord.line) {
                 const x1 = currentWord.x + currentWord.width;
                 const x2 = nextWord.x;
                 this.drawLiaisonConnection(x1, currentWord.y - 10, x2, nextWord.y - 10);
@@ -370,7 +386,6 @@ class LiaisonVisualizer {
 document.addEventListener('DOMContentLoaded', function() {
     const visualizer = new LiaisonVisualizer('visualizationCanvas');
     const sentenceInput = document.getElementById('sentenceInput');
-    const analyzeBtn = document.getElementById('analyzeBtn');
     const playBtn = document.getElementById('playBtn');
     const stopBtn = document.getElementById('stopBtn');
     const speedSlider = document.getElementById('speedSlider');
@@ -390,10 +405,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Event listeners
-    analyzeBtn.addEventListener('click', function() {
-        visualizer.visualizeSentence(sentenceInput.value);
-    });
-
     playBtn.addEventListener('click', function() {
         const sentence = sentenceInput.value;
 

@@ -52,7 +52,7 @@ h1 {
     border-color: #3498db;
 }
 
-#analyzeBtn, #playBtn, #stopBtn {
+#playBtn, #stopBtn {
     padding: 12px 24px;
     background-color: #3498db;
     color: white;
@@ -63,7 +63,7 @@ h1 {
     transition: background-color 0.3s ease;
 }
 
-#analyzeBtn:hover, #playBtn:hover, #stopBtn:hover {
+#playBtn:hover, #stopBtn:hover {
     background-color: #2980b9;
 }
 
