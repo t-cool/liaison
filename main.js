@@ -9,8 +9,27 @@ const sentenceData = {
         "with": { stress: 0, liaison: 0 },
         "his": { stress: 0, liaison: { delete: "s" } },
         "sister": { stress: 1, liaison: 0 }
+    },
+    "She wants to go there.": {
+        "She": { stress: 0, liaison: 0 },
+        "wants": { stress: 1, liaison: { delete: "s" } },
+        "to": { stress: 0, liaison: 0 },
+        "go": { stress: 1, liaison: 0 },
+        "there": { stress: 1, liaison: 0 }
+    },
+    "We need to check it out.": {
+        "We": { stress: 0, liaison: 0 },
+        "need": { stress: 1, liaison: { delete: "d" } },
+        "to": { stress: 0, liaison: 0 },
+        "check": { stress: 1, liaison: 0 },
+        "it": { stress: 0, liaison: { delete: "t" } },
+        "out": { stress: 1, liaison: 0 }
     }
 };
+
+// Array of sentences for navigation
+const sentences = Object.keys(sentenceData);
+let currentSentenceIndex = 0;
 
 class LiaisonVisualizer {
     constructor(canvasId) {
@@ -385,14 +404,27 @@ class LiaisonVisualizer {
 // Initialize the application
 document.addEventListener('DOMContentLoaded', function() {
     const visualizer = new LiaisonVisualizer('visualizationCanvas');
-    const sentenceInput = document.getElementById('sentenceInput');
     const playBtn = document.getElementById('playBtn');
     const stopBtn = document.getElementById('stopBtn');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
     const speedSlider = document.getElementById('speedSlider');
     const speedValue = document.getElementById('speedValue');
 
+    // Function to get current sentence
+    function getCurrentSentence() {
+        return sentences[currentSentenceIndex];
+    }
+
+    // Function to update button states
+    function updateNavigationButtons() {
+        prevBtn.disabled = currentSentenceIndex === 0;
+        nextBtn.disabled = currentSentenceIndex === sentences.length - 1;
+    }
+
     // Initial visualization
-    visualizer.visualizeSentence(sentenceInput.value);
+    visualizer.visualizeSentence(getCurrentSentence());
+    updateNavigationButtons();
 
     // Load voices when they become available
     if ('speechSynthesis' in window) {
@@ -404,9 +436,36 @@ document.addEventListener('DOMContentLoaded', function() {
         };
     }
 
+    // Navigation event listeners
+    prevBtn.addEventListener('click', function() {
+        if (currentSentenceIndex > 0) {
+            currentSentenceIndex--;
+            visualizer.stopAnimation();
+            visualizer.visualizeSentence(getCurrentSentence());
+            updateNavigationButtons();
+
+            // Reset play/stop button visibility
+            playBtn.style.display = 'inline-block';
+            stopBtn.style.display = 'none';
+        }
+    });
+
+    nextBtn.addEventListener('click', function() {
+        if (currentSentenceIndex < sentences.length - 1) {
+            currentSentenceIndex++;
+            visualizer.stopAnimation();
+            visualizer.visualizeSentence(getCurrentSentence());
+            updateNavigationButtons();
+
+            // Reset play/stop button visibility
+            playBtn.style.display = 'inline-block';
+            stopBtn.style.display = 'none';
+        }
+    });
+
     // Event listeners
     playBtn.addEventListener('click', function() {
-        const sentence = sentenceInput.value;
+        const sentence = getCurrentSentence();
 
         // Ensure voices are loaded before playing
         if ('speechSynthesis' in window && speechSynthesis.getVoices().length === 0) {
@@ -425,17 +484,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
     stopBtn.addEventListener('click', function() {
         visualizer.stopAnimation();
-        visualizer.visualizeSentence(sentenceInput.value);
+        visualizer.visualizeSentence(getCurrentSentence());
 
         // Toggle button visibility
         playBtn.style.display = 'inline-block';
         stopBtn.style.display = 'none';
-    });
-
-    sentenceInput.addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-            visualizer.visualizeSentence(sentenceInput.value);
-        }
     });
 
     // Speed control listener

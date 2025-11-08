@@ -9,10 +9,11 @@
 <body>
     <div class="container">
         <h1>Liaison and Stress</h1>
-        <div class="controls">
-            <input type="text" id="sentenceInput" placeholder="Enter an English sentence..." value="I went to the station with his sister.">
+        <div class="navigation">
+            <button id="prevBtn" class="nav-btn">←</button>
             <button id="playBtn">Play with Audio</button>
             <button id="stopBtn" style="display:none;">Stop</button>
+            <button id="nextBtn" class="nav-btn">→</button>
         </div>
         <div class="speed-control">
             <label for="speedSlider">Speech Speed:</label>
@@ -20,17 +21,6 @@
             <span id="speedValue">0.9x</span>
         </div>
         <canvas id="visualizationCanvas" width="1200" height="400"></canvas>
-        <div class="legend">
-            <div class="legend-item">
-                <span class="stress-marker"></span> Stressed syllable
-            </div>
-            <div class="legend-item">
-                <span class="liaison-marker"></span> Liaison connection
-            </div>
-            <div class="legend-item">
-                <span class="delete-marker">/</span> Deleted sound
-            </div>
-        </div>
     </div>
     <script src="main.js"></script>
 </body>
