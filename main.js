@@ -16,10 +16,10 @@ class LiaisonVisualizer {
     constructor(canvasId) {
         this.canvas = document.getElementById(canvasId);
         this.ctx = this.canvas.getContext('2d');
-        this.wordSpacing = 60;
-        this.lineHeight = 80;
+        this.wordSpacing = 90;
+        this.lineHeight = 120;
         this.startX = 60;
-        this.startY = 150;
+        this.startY = 200;
         this.currentHighlight = -1;
         this.wordPositions = [];
         this.animationId = null;
@@ -41,7 +41,7 @@ class LiaisonVisualizer {
     }
 
     drawText(text, x, y, isStressed = false, isHighlighted = false) {
-        this.ctx.font = isStressed ? 'bold 36px Arial' : '32px Arial';
+        this.ctx.font = isStressed ? 'bold 64px Arial' : '56px Arial';
         this.ctx.fillStyle = isHighlighted ? this.colors.highlight : this.colors.text;
         this.ctx.fillText(text, x, y);
         return this.ctx.measureText(text).width;
@@ -50,10 +50,10 @@ class LiaisonVisualizer {
     drawStressMarker(x, y, width) {
         // Draw yellow circle above stressed syllables
         const centerX = x + width / 2;
-        const centerY = y - 40;
+        const centerY = y - 70;
 
         this.ctx.beginPath();
-        this.ctx.arc(centerX, centerY, 15, 0, 2 * Math.PI);
+        this.ctx.arc(centerX, centerY, 25, 0, 2 * Math.PI);
         this.ctx.fillStyle = this.colors.stress;
         this.ctx.fill();
     }
@@ -61,13 +61,13 @@ class LiaisonVisualizer {
     drawLiaisonConnection(x1, y1, x2, y2) {
         // Draw curved line connecting words with liaison
         const midX = (x1 + x2) / 2;
-        const midY = Math.min(y1, y2) - 30;
+        const midY = Math.min(y1, y2) - 50;
 
         this.ctx.beginPath();
         this.ctx.moveTo(x1, y1);
         this.ctx.quadraticCurveTo(midX, midY, x2, y2);
         this.ctx.strokeStyle = this.colors.liaison;
-        this.ctx.lineWidth = 2;
+        this.ctx.lineWidth = 4;
         this.ctx.stroke();
     }
 
@@ -86,9 +86,9 @@ class LiaisonVisualizer {
             const slashX = x + beforeWidth + charWidth / 2;
             const slashY = y - 5;
 
-            this.ctx.font = 'bold 48px Arial';
+            this.ctx.font = 'bold 80px Arial';
             this.ctx.fillStyle = this.colors.delete;
-            this.ctx.fillText('/', slashX - 10, slashY);
+            this.ctx.fillText('/', slashX - 15, slashY);
         }
     }
 
@@ -97,7 +97,7 @@ class LiaisonVisualizer {
 
         const data = sentenceData[sentence];
         if (!data) {
-            this.ctx.font = '32px Arial';
+            this.ctx.font = '56px Arial';
             this.ctx.fillStyle = this.colors.text;
             this.ctx.fillText('No data available for this sentence', this.startX, this.startY);
             return;
@@ -118,7 +118,7 @@ class LiaisonVisualizer {
             const isHighlighted = index === highlightIndex;
 
             // Measure word width before drawing
-            this.ctx.font = isStressed ? 'bold 36px Arial' : '32px Arial';
+            this.ctx.font = isStressed ? 'bold 64px Arial' : '56px Arial';
             const width = this.ctx.measureText(word).width;
 
             // Check if we need to wrap to next line
@@ -164,7 +164,7 @@ class LiaisonVisualizer {
                 currentWord.line === nextWord.line) {
                 const x1 = currentWord.x + currentWord.width;
                 const x2 = nextWord.x;
-                this.drawLiaisonConnection(x1, currentWord.y - 10, x2, nextWord.y - 10);
+                this.drawLiaisonConnection(x1, currentWord.y - 20, x2, nextWord.y - 20);
             }
         }
     }
