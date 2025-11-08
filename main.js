@@ -122,7 +122,7 @@ class LiaisonVisualizer {
             return;
         }
 
-        const words = sentence.replace('.', '').split(' ');
+        const words = sentence.split(' ');
         const maxWidth = this.canvas.width - this.startX * 2; // Leave margin on both sides
         let currentX = this.startX;
         let currentY = this.startY;
@@ -130,7 +130,9 @@ class LiaisonVisualizer {
 
         // First pass: draw words with line wrapping and collect positions
         words.forEach((word, index) => {
-            const wordData = data[word];
+            // Strip punctuation for data lookup but keep it for display
+            const wordForLookup = word.replace(/[.,!?;:]$/, '');
+            const wordData = data[wordForLookup];
             if (!wordData) return;
 
             const isStressed = wordData.stress === 1;
@@ -166,7 +168,7 @@ class LiaisonVisualizer {
 
             // Draw delete mark if needed
             if (wordData.liaison && wordData.liaison.delete) {
-                this.drawDeleteMark(word, currentX, currentY, wordData.liaison.delete);
+                this.drawDeleteMark(wordForLookup, currentX, currentY, wordData.liaison.delete);
             }
 
             currentX += width + this.wordSpacing;
@@ -202,11 +204,11 @@ class LiaisonVisualizer {
         // Stop any ongoing animation
         this.stopAnimation();
 
-        const words = sentence.replace('.', '').split(' ');
+        const words = sentence.split(' ');
         let currentWordIndex = -1;
 
-        // Calculate word weights for better timing
-        const wordWeights = words.map(word => this.getWordWeight(word));
+        // Calculate word weights for better timing (strip punctuation for weight calculation)
+        const wordWeights = words.map(word => this.getWordWeight(word.replace(/[.,!?;:]$/, '')));
         const totalWeight = wordWeights.reduce((sum, weight) => sum + weight, 0);
 
         // Create word position mapping for accurate tracking
