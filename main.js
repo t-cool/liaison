@@ -500,4 +500,32 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Initialize speed display
     speedValue.textContent = speedSlider.value + 'x';
+
+    // Keyboard navigation with arrow keys
+    document.addEventListener('keydown', function(e) {
+        // Left arrow key
+        if (e.key === 'ArrowLeft' && currentSentenceIndex > 0) {
+            e.preventDefault();
+            currentSentenceIndex--;
+            visualizer.stopAnimation();
+            visualizer.visualizeSentence(getCurrentSentence());
+            updateNavigationButtons();
+
+            // Reset play/stop button visibility
+            playBtn.style.display = 'inline-block';
+            stopBtn.style.display = 'none';
+        }
+        // Right arrow key
+        else if (e.key === 'ArrowRight' && currentSentenceIndex < sentences.length - 1) {
+            e.preventDefault();
+            currentSentenceIndex++;
+            visualizer.stopAnimation();
+            visualizer.visualizeSentence(getCurrentSentence());
+            updateNavigationButtons();
+
+            // Reset play/stop button visibility
+            playBtn.style.display = 'inline-block';
+            stopBtn.style.display = 'none';
+        }
+    });
 });
